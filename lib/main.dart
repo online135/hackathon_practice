@@ -96,7 +96,7 @@ class _TodoListScreenState extends State<TodoListScreen> {
                     : TextDecoration.none,
               ),
             ),
-            leading: Checkbox(
+            leading: Switch(
               value: todoItem['completed'],
               onChanged: (value) {
                 _toggleTodoItem(index);
