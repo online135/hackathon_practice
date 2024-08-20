@@ -36,7 +36,8 @@ dependencies:
   cupertino_icons: ^1.0.8
   transparent_image: 2.0.1
   shared_preferences: ^2.0.15  # 使用最新版本
-  
+  webview_flutter: ^3.0.4
+
 dev_dependencies:
   flutter_test:
     sdk: flutter

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
+import 'second_page.dart';
+
 
 void main() {
   runApp(MyApp());
@@ -105,11 +107,23 @@ class _TodoListScreenState extends State<TodoListScreen> {
     );
   }
 
+  void _navigateToSecondPage() {
+    Navigator.of(context).push(
+      MaterialPageRoute(builder: (context) => SecondPage()),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Text('To-Do List'),
+        actions: [
+          IconButton(
+            icon: Icon(Icons.arrow_forward),
+            onPressed: _navigateToSecondPage,
+          ),
+        ],
       ),
       body: ListView.builder(
         itemCount: _todoList.length,
