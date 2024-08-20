@@ -37,7 +37,13 @@ dependencies:
   transparent_image: 2.0.1
   shared_preferences: ^2.0.15  # 使用最新版本
   webview_flutter: ^3.0.4
-  http: ^1.2.2
+  http: ^0.13.6
+  # 申請權限
+  permission_handler: ^10.2.0
+  # 拍照
+  camera: 0.10.5+2
+  # 儲存至相簿
+  gallery_saver: ^2.3.2
 
 dev_dependencies:
   flutter_test:

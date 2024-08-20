@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'second_page.dart'; // 載入第二頁
 
 void main() {
   runApp(MyApp());
@@ -136,7 +137,7 @@ class _MainScreenState extends State<MainScreen> {
             icon: Icon(Icons.arrow_forward),
             onPressed: () {
               Navigator.of(context).push(
-                MaterialPageRoute(builder: (context) => _buildSecondPage()),
+                MaterialPageRoute(builder: (context) => SecondPage()),
               );
             },
           ),
@@ -177,28 +178,28 @@ class _MainScreenState extends State<MainScreen> {
     );
   }
 
-  Widget _buildSecondPage() {
+  Widget _buildLeftPage() {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Second Page'),
+        title: Text('Left Page'),
       ),
       body: Center(
         child: Text(
-          'This is the second page',
+          'This is the left page',
           style: TextStyle(fontSize: 24),
         ),
       ),
     );
   }
 
-  Widget _buildThirdPage() {
+  Widget _buildRightPage() {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Third Page'),
+        title: Text('Right Page'),
       ),
       body: Center(
         child: Text(
-          'This is the third page',
+          'This is the right page',
           style: TextStyle(fontSize: 24),
         ),
       ),
@@ -217,9 +218,9 @@ class _MainScreenState extends State<MainScreen> {
       body: IndexedStack(
         index: _selectedIndex,
         children: [
-          _buildSecondPage(), // 左邊的頁面
+          _buildLeftPage(), // 左邊的頁面
           _buildTodoListPage(), // 中間的 Home 頁面
-          _buildThirdPage(), // 右邊的頁面
+          _buildRightPage(), // 右邊的頁面
         ],
       ),
       bottomNavigationBar: BottomNavigationBar(
