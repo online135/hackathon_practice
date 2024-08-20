@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
-import 'second_page.dart';
-
+import 'package:http/http.dart' as http;
 
 void main() {
   runApp(MyApp());
@@ -16,17 +15,18 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: TodoListScreen(),
+      home: MainScreen(),
     );
   }
 }
 
-class TodoListScreen extends StatefulWidget {
+class MainScreen extends StatefulWidget {
   @override
-  _TodoListScreenState createState() => _TodoListScreenState();
+  _MainScreenState createState() => _MainScreenState();
 }
 
-class _TodoListScreenState extends State<TodoListScreen> {
+class _MainScreenState extends State<MainScreen> {
+  int _selectedIndex = 1;
   List<Map<String, dynamic>> _todoList = [];
   final TextEditingController _controller = TextEditingController();
 
@@ -37,14 +37,20 @@ class _TodoListScreenState extends State<TodoListScreen> {
   }
 
   Future<void> _loadTodoList() async {
-    final prefs = await SharedPreferences.getInstance();
-    final String? todoListString = prefs.getString('todoList');
-    if (todoListString != null) {
+    final response = await http.get(Uri.parse('http://your-backend-url.com/api/todos'));
+
+    if (response.statusCode == 200) {
+      final List<dynamic> todoListJson = json.decode(response.body);
       setState(() {
-        _todoList = List<Map<String, dynamic>>.from(
-          json.decode(todoListString) as List,
-        );
+        _todoList = todoListJson.map((item) {
+          return {
+            'title': item['title'],
+            'completed': item['completed'],
+          };
+        }).toList();
       });
+    } else {
+      throw Exception('Failed to load todos');
     }
   }
 
@@ -53,12 +59,24 @@ class _TodoListScreenState extends State<TodoListScreen> {
     prefs.setString('todoList', json.encode(_todoList));
   }
 
+  Future<void> _sendTodoListToBackend() async {
+    final url = Uri.parse('http://your-backend-url.com/api/todos');
+    for (var todoItem in _todoList) {
+      await http.post(
+        url,
+        headers: {'Content-Type': 'application/json'},
+        body: json.encode(todoItem),
+      );
+    }
+  }
+
   void _addTodoItem(String title) {
     setState(() {
       _todoList.add({'title': title, 'completed': false});
     });
     _controller.clear();
     _saveTodoList();
+    _sendTodoListToBackend();  // 保存後發送資料到後端
   }
 
   void _toggleTodoItem(int index) {
@@ -66,6 +84,7 @@ class _TodoListScreenState extends State<TodoListScreen> {
       _todoList[index]['completed'] = !_todoList[index]['completed'];
     });
     _saveTodoList();
+    _sendTodoListToBackend();  // 切換完成狀態後發送資料到後端
   }
 
   void _deleteTodoItem(int index) {
@@ -73,6 +92,7 @@ class _TodoListScreenState extends State<TodoListScreen> {
       _todoList.removeAt(index);
     });
     _saveTodoList();
+    _sendTodoListToBackend();  // 刪除後發送資料到後端
   }
 
   void _showAddTodoDialog() {
@@ -107,21 +127,18 @@ class _TodoListScreenState extends State<TodoListScreen> {
     );
   }
 
-  void _navigateToSecondPage() {
-    Navigator.of(context).push(
-      MaterialPageRoute(builder: (context) => SecondPage()),
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) {
+  Widget _buildTodoListPage() {
     return Scaffold(
       appBar: AppBar(
         title: Text('To-Do List'),
         actions: [
           IconButton(
             icon: Icon(Icons.arrow_forward),
-            onPressed: _navigateToSecondPage,
+            onPressed: () {
+              Navigator.of(context).push(
+                MaterialPageRoute(builder: (context) => _buildSecondPage()),
+              );
+            },
           ),
         ],
       ),
@@ -156,6 +173,72 @@ class _TodoListScreenState extends State<TodoListScreen> {
       floatingActionButton: FloatingActionButton(
         onPressed: _showAddTodoDialog,
         child: Icon(Icons.add),
+      ),
+    );
+  }
+
+  Widget _buildSecondPage() {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Second Page'),
+      ),
+      body: Center(
+        child: Text(
+          'This is the second page',
+          style: TextStyle(fontSize: 24),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildThirdPage() {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Third Page'),
+      ),
+      body: Center(
+        child: Text(
+          'This is the third page',
+          style: TextStyle(fontSize: 24),
+        ),
+      ),
+    );
+  }
+
+  void _onItemTapped(int index) {
+    setState(() {
+      _selectedIndex = index;
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: IndexedStack(
+        index: _selectedIndex,
+        children: [
+          _buildSecondPage(), // 左邊的頁面
+          _buildTodoListPage(), // 中間的 Home 頁面
+          _buildThirdPage(), // 右邊的頁面
+        ],
+      ),
+      bottomNavigationBar: BottomNavigationBar(
+        items: const <BottomNavigationBarItem>[
+          BottomNavigationBarItem(
+            icon: Icon(Icons.arrow_back),
+            label: 'Page 1',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.home),
+            label: 'Home',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.arrow_forward),
+            label: 'Page 3',
+          ),
+        ],
+        currentIndex: _selectedIndex,
+        onTap: _onItemTapped,
       ),
     );
   }
