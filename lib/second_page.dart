@@ -21,15 +21,13 @@ class _SecondPageState extends State<SecondPage> {
   Future<void> _setupCameras() async {
     // 获取可用的摄像头
     cameras = await availableCameras();
+    // Initialize the camera controller
+    _controller = CameraController(cameras![0], ResolutionPreset.high);
+    _initializeControllerFuture = _controller!.initialize();
+    setState(() {});
   }
 
   Future<void> _takePicture() async {
-    // 初始化控制器
-    if (_controller == null) {
-      _controller = CameraController(cameras![0], ResolutionPreset.high);
-      _initializeControllerFuture = _controller!.initialize();
-    }
-
     try {
       await _initializeControllerFuture;
 
@@ -61,11 +59,28 @@ class _SecondPageState extends State<SecondPage> {
       appBar: AppBar(
         title: Text('Second Page - Camera'),
       ),
-      body: Center(
-        child: ElevatedButton(
-          onPressed: _takePicture,
-          child: Text('Open Camera'),
-        ),
+      body: Column(
+        children: [
+          // Display the camera preview
+          Expanded(
+            child: _controller == null
+                ? Center(child: CircularProgressIndicator())
+                : FutureBuilder<void>(
+                    future: _initializeControllerFuture,
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.done) {
+                        return CameraPreview(_controller!);
+                      } else {
+                        return Center(child: CircularProgressIndicator());
+                      }
+                    },
+                  ),
+          ),
+          ElevatedButton(
+            onPressed: _takePicture,
+            child: Text('Take Picture'),
+          ),
+        ],
       ),
     );
   }
