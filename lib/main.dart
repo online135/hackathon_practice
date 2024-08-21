@@ -3,6 +3,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'second_page.dart'; // 載入第二頁
+import 'left_page.dart'; // 載入第二頁
 
 void main() {
   runApp(const MyApp());
@@ -183,17 +184,7 @@ class _MainScreenState extends State<MainScreen> {
   }
 
   Widget _buildLeftPage() {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Left Page'),
-      ),
-      body: const Center(
-        child: Text(
-          'This is the left page',
-          style: TextStyle(fontSize: 24),
-        ),
-      ),
-    );
+    return const LeftPage();
   }
 
   Widget _buildRightPage() {

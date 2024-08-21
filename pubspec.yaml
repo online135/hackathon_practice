@@ -45,6 +45,7 @@ dependencies:
   # 儲存至相簿
   gallery_saver: ^2.3.2
 
+  intl: any
 dev_dependencies:
   flutter_test:
     sdk: flutter
