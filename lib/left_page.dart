@@ -55,13 +55,22 @@ class _LeftPageState extends State<LeftPage> {
             const SizedBox(height: 16.0),
             const Text('Description'),
             const SizedBox(height: 8.0),
-            TextField(
-              maxLength: 20,
-              onChanged: (value) {
-                setState(() {
-                  _description = value;
-                });
-              },
+            SizedBox(
+              height: 100, // 設定容器高度為 100
+              child: TextField(
+                maxLines: null, // 允許多行輸入
+                expands: true, // 自動調整高度
+                minLines: null, // 最小 3 行
+                onChanged: (value) {
+                  setState(() {
+                    _description = value;
+                  });
+                },
+                decoration: const InputDecoration(
+                  border: OutlineInputBorder(),
+                  hintText: 'Enter description (max 20 characters)',
+                ),
+              ),
             ),
             const SizedBox(height: 16.0),
             const Text('Select Option'),
