@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class LeftPage extends StatefulWidget {
   const LeftPage({super.key});
@@ -14,6 +15,12 @@ class _LeftPageState extends State<LeftPage> {
   String _selectedOption = 'Option 1';
   final List<String> _options = ['Option 1', 'Option 2', 'Option 3'];
 
+  @override
+  void initState() {
+    super.initState();
+    _loadFormData();
+  }
+
   Future<void> _selectDate(BuildContext context) async {
     final DateTime? picked = await showDatePicker(
       context: context,
@@ -24,6 +31,23 @@ class _LeftPageState extends State<LeftPage> {
     if (picked != null && picked != _selectedDate) {
       setState(() {
         _selectedDate = picked;
+        _saveFormData();
+      });
+    }
+  }
+
+  void _updateDescription(String value) {
+    setState(() {
+      _description = value;
+      _saveFormData();
+    });
+  }
+
+  void _updateSelectedOption(String? newValue) {
+    if (newValue != null) {
+      setState(() {
+        _selectedOption = newValue;
+        _saveFormData();
       });
     }
   }
@@ -33,6 +57,30 @@ class _LeftPageState extends State<LeftPage> {
     print('Selected date: ${DateFormat('yyyy-MM-dd').format(_selectedDate)}');
     print('Description: $_description');
     print('Selected option: $_selectedOption');
+    _clearFormData();
+  }
+
+  Future<void> _saveFormData() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('selectedDate', _selectedDate.toString());
+    await prefs.setString('description', _description);
+    await prefs.setString('selectedOption', _selectedOption);
+  }
+
+  Future<void> _loadFormData() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      _selectedDate = DateTime.parse(prefs.getString('selectedDate') ?? _selectedDate.toString());
+      _description = prefs.getString('description') ?? '';
+      _selectedOption = prefs.getString('selectedOption') ?? 'Option 1';
+    });
+  }
+
+  Future<void> _clearFormData() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.remove('selectedDate');
+    await prefs.remove('description');
+    await prefs.remove('selectedOption');
   }
 
   @override
@@ -56,16 +104,12 @@ class _LeftPageState extends State<LeftPage> {
             const Text('Description'),
             const SizedBox(height: 8.0),
             SizedBox(
-              height: 100, // 設定容器高度為 100
+              height: 100,
               child: TextField(
-                maxLines: null, // 允許多行輸入
-                expands: true, // 自動調整高度
-                minLines: null, // 最小 3 行
-                onChanged: (value) {
-                  setState(() {
-                    _description = value;
-                  });
-                },
+                maxLines: null,
+                expands: true,
+                minLines: null,
+                onChanged: _updateDescription,
                 decoration: const InputDecoration(
                   border: OutlineInputBorder(),
                   hintText: 'Enter description (max 20 characters)',
@@ -77,11 +121,7 @@ class _LeftPageState extends State<LeftPage> {
             const SizedBox(height: 8.0),
             DropdownButton<String>(
               value: _selectedOption,
-              onChanged: (String? newValue) {
-                setState(() {
-                  _selectedOption = newValue!;
-                });
-              },
+              onChanged: _updateSelectedOption,
               items: _options.map<DropdownMenuItem<String>>((String value) {
                 return DropdownMenuItem<String>(
                   value: value,
