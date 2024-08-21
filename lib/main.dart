@@ -5,10 +5,12 @@ import 'package:http/http.dart' as http;
 import 'second_page.dart'; // 載入第二頁
 
 void main() {
-  runApp(MyApp());
+  runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -16,12 +18,14 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: MainScreen(),
+      home: const MainScreen(),
     );
   }
 }
 
 class MainScreen extends StatefulWidget {
+  const MainScreen({super.key});
+
   @override
   _MainScreenState createState() => _MainScreenState();
 }
@@ -101,17 +105,17 @@ class _MainScreenState extends State<MainScreen> {
       context: context,
       builder: (context) {
         return AlertDialog(
-          title: Text('Add a new task'),
+          title: const Text('Add a new task'),
           content: TextField(
             controller: _controller,
-            decoration: InputDecoration(hintText: 'Enter task title'),
+            decoration: const InputDecoration(hintText: 'Enter task title'),
           ),
           actions: [
             TextButton(
               onPressed: () {
                 Navigator.of(context).pop();
               },
-              child: Text('Cancel'),
+              child: const Text('Cancel'),
             ),
             ElevatedButton(
               onPressed: () {
@@ -120,7 +124,7 @@ class _MainScreenState extends State<MainScreen> {
                   Navigator.of(context).pop();
                 }
               },
-              child: Text('Add'),
+              child: const Text('Add'),
             ),
           ],
         );
@@ -131,13 +135,13 @@ class _MainScreenState extends State<MainScreen> {
   Widget _buildTodoListPage() {
     return Scaffold(
       appBar: AppBar(
-        title: Text('To-Do List'),
+        title: const Text('To-Do List'),
         actions: [
           IconButton(
-            icon: Icon(Icons.arrow_forward),
+            icon: const Icon(Icons.arrow_forward),
             onPressed: () {
               Navigator.of(context).push(
-                MaterialPageRoute(builder: (context) => SecondPage()),
+                MaterialPageRoute(builder: (context) => const SecondPage()),
               );
             },
           ),
@@ -163,7 +167,7 @@ class _MainScreenState extends State<MainScreen> {
               },
             ),
             trailing: IconButton(
-              icon: Icon(Icons.delete),
+              icon: const Icon(Icons.delete),
               onPressed: () {
                 _deleteTodoItem(index);
               },
@@ -173,7 +177,7 @@ class _MainScreenState extends State<MainScreen> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: _showAddTodoDialog,
-        child: Icon(Icons.add),
+        child: const Icon(Icons.add),
       ),
     );
   }
@@ -181,9 +185,9 @@ class _MainScreenState extends State<MainScreen> {
   Widget _buildLeftPage() {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Left Page'),
+        title: const Text('Left Page'),
       ),
-      body: Center(
+      body: const Center(
         child: Text(
           'This is the left page',
           style: TextStyle(fontSize: 24),
@@ -195,9 +199,9 @@ class _MainScreenState extends State<MainScreen> {
   Widget _buildRightPage() {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Right Page'),
+        title: const Text('Right Page'),
       ),
-      body: Center(
+      body: const Center(
         child: Text(
           'This is the right page',
           style: TextStyle(fontSize: 24),

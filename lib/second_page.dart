@@ -3,6 +3,8 @@ import 'package:camera/camera.dart';
 import 'dart:io';
 
 class SecondPage extends StatefulWidget {
+  const SecondPage({super.key});
+
   @override
   _SecondPageState createState() => _SecondPageState();
 }
@@ -57,28 +59,28 @@ class _SecondPageState extends State<SecondPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Second Page - Camera'),
+        title: const Text('Second Page - Camera'),
       ),
       body: Column(
         children: [
           // Display the camera preview
           Expanded(
             child: _controller == null
-                ? Center(child: CircularProgressIndicator())
+                ? const Center(child: CircularProgressIndicator())
                 : FutureBuilder<void>(
                     future: _initializeControllerFuture,
                     builder: (context, snapshot) {
                       if (snapshot.connectionState == ConnectionState.done) {
                         return CameraPreview(_controller!);
                       } else {
-                        return Center(child: CircularProgressIndicator());
+                        return const Center(child: CircularProgressIndicator());
                       }
                     },
                   ),
           ),
           ElevatedButton(
             onPressed: _takePicture,
-            child: Text('Take Picture'),
+            child: const Text('Take Picture'),
           ),
         ],
       ),
@@ -89,12 +91,12 @@ class _SecondPageState extends State<SecondPage> {
 class DisplayPictureScreen extends StatelessWidget {
   final String imagePath;
 
-  DisplayPictureScreen({required this.imagePath});
+  const DisplayPictureScreen({super.key, required this.imagePath});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Display Picture')),
+      appBar: AppBar(title: const Text('Display Picture')),
       body: Image.file(File(imagePath)),
     );
   }
