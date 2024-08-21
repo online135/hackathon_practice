@@ -83,60 +83,60 @@ class _LeftPageState extends State<LeftPage> {
     await prefs.remove('selectedOption');
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Left Page'),
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text('Select Date'),
-            const SizedBox(height: 8.0),
-            ElevatedButton(
-              onPressed: () => _selectDate(context),
-              child: Text(DateFormat('yyyy-MM-dd').format(_selectedDate)),
-            ),
-            const SizedBox(height: 16.0),
-            const Text('Description'),
-            const SizedBox(height: 8.0),
-            SizedBox(
-              height: 100,
-              child: TextField(
-                maxLines: null,
-                expands: true,
-                minLines: null,
-                onChanged: _updateDescription,
-                decoration: const InputDecoration(
-                  border: OutlineInputBorder(),
-                  hintText: 'Enter description (max 20 characters)',
-                ),
+@override
+Widget build(BuildContext context) {
+  return Scaffold(
+    appBar: AppBar(
+      title: const Text('Left Page'),
+    ),
+    body: Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text('Select Date'),
+          const SizedBox(height: 8.0),
+          ElevatedButton(
+            onPressed: () => _selectDate(context),
+            child: Text(DateFormat('yyyy-MM-dd').format(_selectedDate)),
+          ),
+          const SizedBox(height: 16.0),
+          const Text('Description'),
+          const SizedBox(height: 8.0),
+          Expanded(
+            child: TextField(
+              maxLines: null,
+              expands: true,
+              minLines: null,
+              onChanged: _updateDescription,
+              decoration: const InputDecoration(
+                border: OutlineInputBorder(),
+                hintText: 'Enter description (max 20 characters)',
               ),
+              controller: TextEditingController(text: _description),
             ),
-            const SizedBox(height: 16.0),
-            const Text('Select Option'),
-            const SizedBox(height: 8.0),
-            DropdownButton<String>(
-              value: _selectedOption,
-              onChanged: _updateSelectedOption,
-              items: _options.map<DropdownMenuItem<String>>((String value) {
-                return DropdownMenuItem<String>(
-                  value: value,
-                  child: Text(value),
-                );
-              }).toList(),
-            ),
-            const SizedBox(height: 16.0),
-            ElevatedButton(
-              onPressed: _submitForm,
-              child: const Text('Submit'),
-            ),
-          ],
-        ),
+          ),
+          const SizedBox(height: 16.0),
+          const Text('Select Option'),
+          const SizedBox(height: 8.0),
+          DropdownButton<String>(
+            value: _selectedOption,
+            onChanged: _updateSelectedOption,
+            items: _options.map<DropdownMenuItem<String>>((String value) {
+              return DropdownMenuItem<String>(
+                value: value,
+                child: Text(value),
+              );
+            }).toList(),
+          ),
+          const SizedBox(height: 16.0),
+          ElevatedButton(
+            onPressed: _submitForm,
+            child: const Text('Submit'),
+          ),
+        ],
       ),
-    );
-  }
+    ),
+  );
+}
 }
