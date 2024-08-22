@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 class LeftPage extends StatefulWidget {
   const LeftPage({super.key});
@@ -52,12 +54,29 @@ class _LeftPageState extends State<LeftPage> {
     }
   }
 
-  void _submitForm() {
-    // 在這裡實現表單提交的邏輯
-    print('Selected date: ${DateFormat('yyyy-MM-dd').format(_selectedDate)}');
-    print('Description: $_description');
-    print('Selected option: $_selectedOption');
-    _clearFormData();
+  void _submitForm() async {
+    final url = Uri.parse('http://localhost:8080/api/data'); // Replace with your server's IP address or hostname
+
+    final Map<String, dynamic> data = {
+      'selectedDate': DateFormat('yyyy-MM-dd').format(_selectedDate),
+      'description': _description,
+      'selectedOption': _selectedOption,
+    };
+
+    final response = await http.post(
+      url,
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: jsonEncode(data),
+    );
+
+    if (response.statusCode == 201) {
+      print('Data sent successfully');
+      _clearFormData();
+    } else {
+      print('Failed to send data');
+    }
   }
 
   Future<void> _saveFormData() async {
