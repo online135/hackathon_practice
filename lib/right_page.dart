@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
 import 'mock_data.dart'; // 導入模擬數據
 import 'right2_page.dart'; // 導入模擬數據
 
@@ -14,7 +13,7 @@ class RightPage extends StatefulWidget {
 }
 
 class _RightPageState extends State<RightPage> {
-  String _responseText = 'Loading...';
+  final String _responseText = 'Loading...';
   late Future<List<Toilet>> futureToilets;
 
   @override
@@ -25,7 +24,7 @@ class _RightPageState extends State<RightPage> {
 
   Future<List<Toilet>> _fetchData() async {
     // 使用模擬數據而不是實際的 API 調用
-    await Future.delayed(Duration(seconds: 1)); // 模擬網絡延遲
+    await Future.delayed(const Duration(seconds: 1)); // 模擬網絡延遲
     final jsonData = jsonDecode(mockApiResponse);
     final results = jsonData['result']['results'] as List;
     return results.map((toiletData) => Toilet.fromJson(toiletData)).toList();
@@ -55,19 +54,19 @@ class _RightPageState extends State<RightPage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            Text(
+            const Text(
               'Welcome to Right Page!',
               style: TextStyle(fontSize: 24),
             ),
-            SizedBox(height: 5),
+            const SizedBox(height: 5),
             ElevatedButton(
               onPressed: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => Right2Page()),
+                  MaterialPageRoute(builder: (context) => const Right2Page()),
                 );
               },
-              child: Text('Go to Right2 Page'),
+              child: const Text('Go to Right2 Page'),
             ),
             Expanded(
               child: FutureBuilder<List<Toilet>>(

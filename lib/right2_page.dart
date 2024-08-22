@@ -1,8 +1,7 @@
 import 'dart:async';
-import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'mock_data.dart'; // 導入模擬數據
+// 導入模擬數據
 
 
 class Right2Page extends StatefulWidget {
@@ -13,7 +12,7 @@ class Right2Page extends StatefulWidget {
 }
 
 class _RightPageState extends State<Right2Page> {
-  String _responseText = 'Loading...';
+  final String _responseText = 'Loading...';
   late Future<String> futureData ;
 
   @override
@@ -23,7 +22,7 @@ class _RightPageState extends State<Right2Page> {
   }
 
   Future<String> _fetchData() async {
-    final apiUrl = 'http://localhost:8080/api/data'; // 確保這個 URL 與你的 Java 服務匹配
+    const apiUrl = 'http://localhost:8080/api/data'; // 確保這個 URL 與你的 Java 服務匹配
     final response = await http.get(Uri.parse(apiUrl));
 
     if (response.statusCode == 200) {
@@ -44,7 +43,7 @@ class _RightPageState extends State<Right2Page> {
           future: futureData,
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
-              return CircularProgressIndicator();
+              return const CircularProgressIndicator();
             } else if (snapshot.hasError) {
               return Text('Error: ${snapshot.error}');
             } else if (snapshot.hasData) {
@@ -53,7 +52,7 @@ class _RightPageState extends State<Right2Page> {
                 child: Text(snapshot.data!),
               );
             } else {
-              return Text('No data');
+              return const Text('No data');
             }
           },
         ),
