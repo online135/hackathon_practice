@@ -3,6 +3,8 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'mock_data.dart'; // 導入模擬數據
+import 'right2_page.dart'; // 導入模擬數據
+
 
 class RightPage extends StatefulWidget {
   const RightPage({super.key});
@@ -55,28 +57,47 @@ class _RightPageState extends State<RightPage> {
           title: const Text('Taipei Public Toilets'),
         ),
         body: Center(
-          child: FutureBuilder<List<Toilet>>(
-            future: futureToilets, // 呼叫一個變數 futureAlbum, futureAlbum 再呼叫 _fetchData() 去抓資料
-            builder: (context, snapshot) { // 資料會存在 snapshot 裡面(此時已經是 json object Album, 為什麼是 json 要看 _fetchData() )
-              if (snapshot.hasData) {
-                return ListView.builder(
-                  itemCount: snapshot.data!.length,
-                  itemBuilder: (context, index) {
-                    final toilet = snapshot.data![index];
-                    return ListTile(
-                      title: Text(toilet.name),
-                      subtitle: Text('${toilet.district} - ${toilet.category}'),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              Text(
+                'Welcome to Right Page!',
+                style: TextStyle(fontSize: 24),
+              ),
+              SizedBox(height: 20),
+              ElevatedButton(
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => Right2Page()),
+                  );
+                },
+                child: Text('Go to Right2 Page'),
+              ),
+              FutureBuilder<List<Toilet>>(
+                future: futureToilets, // 呼叫一個變數 futureAlbum, futureAlbum 再呼叫 _fetchData() 去抓資料
+                builder: (context, snapshot) { // 資料會存在 snapshot 裡面(此時已經是 json object Album, 為什麼是 json 要看 _fetchData() )
+                  if (snapshot.hasData) {
+                    return ListView.builder(
+                      itemCount: snapshot.data!.length,
+                      itemBuilder: (context, index) {
+                        final toilet = snapshot.data![index];
+                        return ListTile(
+                          title: Text(toilet.name),
+                          subtitle: Text('${toilet.district} - ${toilet.category}'),
+                        );
+                      },
                     );
-                  },
-                );
-              } else if (snapshot.hasError) {
-                return Text('Error: ${snapshot.error}');
-              }
+                  } else if (snapshot.hasError) {
+                    return Text('Error: ${snapshot.error}');
+                  }
 
-              // By default, show a loading spinner.
-              return const CircularProgressIndicator();
-            },
-          ),
+                  // By default, show a loading spinner.
+                  return const CircularProgressIndicator();
+                },
+              ),
+            ],
+          )
         ),
       ),
     );
