@@ -64,13 +64,18 @@ class _RightPageState extends State<RightPage> {
                 'Welcome to Right Page!',
                 style: TextStyle(fontSize: 24),
               ),
-              SizedBox(height: 20),
+              SizedBox(height: 5),
               ElevatedButton(
                 onPressed: () {
+                  print('Button Pressed'); // Debug print
                   Navigator.push(
                     context,
                     MaterialPageRoute(builder: (context) => Right2Page()),
-                  );
+                  ).then((_) {
+                    print('Navigation completed'); // Debug print
+                  }).catchError((error) {
+                    print('Navigation error: $error'); // Debug print for errors
+                  });
                 },
                 child: Text('Go to Right2 Page'),
               ),
