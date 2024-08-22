@@ -47,41 +47,32 @@ class _RightPageState extends State<RightPage> {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Taipei Public Toilets',
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Taipei Public Toilets'),
       ),
-      home: Scaffold(
-        appBar: AppBar(
-          title: const Text('Taipei Public Toilets'),
-        ),
-        body: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: <Widget>[
-              Text(
-                'Welcome to Right Page!',
-                style: TextStyle(fontSize: 24),
-              ),
-              SizedBox(height: 5),
-              ElevatedButton(
-                onPressed: () {
-                  print('Button Pressed'); // Debug print
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => Right2Page()),
-                  ).then((_) {
-                    print('Navigation completed'); // Debug print
-                  }).catchError((error) {
-                    print('Navigation error: $error'); // Debug print for errors
-                  });
-                },
-                child: Text('Go to Right2 Page'),
-              ),
-              FutureBuilder<List<Toilet>>(
-                future: futureToilets, // 呼叫一個變數 futureAlbum, futureAlbum 再呼叫 _fetchData() 去抓資料
-                builder: (context, snapshot) { // 資料會存在 snapshot 裡面(此時已經是 json object Album, 為什麼是 json 要看 _fetchData() )
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            Text(
+              'Welcome to Right Page!',
+              style: TextStyle(fontSize: 24),
+            ),
+            SizedBox(height: 5),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => Right2Page()),
+                );
+              },
+              child: Text('Go to Right2 Page'),
+            ),
+            Expanded(
+              child: FutureBuilder<List<Toilet>>(
+                future: futureToilets,
+                builder: (context, snapshot) {
                   if (snapshot.hasData) {
                     return ListView.builder(
                       itemCount: snapshot.data!.length,
@@ -96,14 +87,12 @@ class _RightPageState extends State<RightPage> {
                   } else if (snapshot.hasError) {
                     return Text('Error: ${snapshot.error}');
                   }
-
-                  // By default, show a loading spinner.
                   return const CircularProgressIndicator();
                 },
               ),
-            ],
-          )
-        ),
+            ),
+          ],
+        )
       ),
     );
   }
