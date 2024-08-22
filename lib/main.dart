@@ -3,7 +3,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'second_page.dart'; // 載入第二頁
-import 'left_page.dart'; // 載入第二頁
+import 'left_page.dart'; // 載入左頁
+import 'right_page.dart'; // 載入右頁
 
 void main() {
   runApp(const MyApp());
@@ -188,17 +189,7 @@ class _MainScreenState extends State<MainScreen> {
   }
 
   Widget _buildRightPage() {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Right Page'),
-      ),
-      body: const Center(
-        child: Text(
-          'This is the right page',
-          style: TextStyle(fontSize: 24),
-        ),
-      ),
-    );
+    return const RightPage();
   }
 
   void _onItemTapped(int index) {
