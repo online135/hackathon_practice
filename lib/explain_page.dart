@@ -5,14 +5,14 @@ import 'mock_data.dart'; // 導入模擬數據
 import 'right2_page.dart'; // 導入模擬數據
 
 
-class RightPage extends StatefulWidget {
-  const RightPage({super.key});
+class ExplainPage extends StatefulWidget {
+  const ExplainPage({super.key});
 
   @override
-  _RightPageState createState() => _RightPageState();
+  _ExplainPageState createState() => _ExplainPageState();
 }
 
-class _RightPageState extends State<RightPage> {
+class _ExplainPageState extends State<ExplainPage> {
   final String _responseText = 'Loading...';
   late Future<List<Toilet>> futureToilets;
 

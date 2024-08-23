@@ -2,9 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-import 'second_page.dart'; // 載入第二頁
-import 'left_page.dart'; // 載入左頁
-import 'right_page.dart'; // 載入右頁
+import 'add_page.dart'; // 載入左頁 - 新增頁
+import 'explain_page.dart'; // 載入右頁 - 說明頁
+import 'config.dart'; // 導入配置檔案
+
 
 void main() {
   runApp(const MyApp());
@@ -16,180 +17,124 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'To-Do List App',
+      title: '市政通報追蹤',
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: const MainScreen(),
+      home: const IssueListPage(),
     );
   }
 }
 
-class MainScreen extends StatefulWidget {
-  const MainScreen({super.key});
+class IssueListPage extends StatefulWidget {
+  const IssueListPage({super.key});
 
   @override
-  _MainScreenState createState() => _MainScreenState();
+  _IssueListPageState createState() => _IssueListPageState();
 }
 
-class _MainScreenState extends State<MainScreen> {
+class _IssueListPageState extends State<IssueListPage> {
   int _selectedIndex = 1;
-  List<Map<String, dynamic>> _todoList = [];
+  List<Map<String, dynamic>> _issueList = [];
   final TextEditingController _controller = TextEditingController();
 
   @override
   void initState() {
     super.initState();
-    _loadTodoList();
+    _loadIssueList();
   }
 
-  Future<void> _loadTodoList() async {
-    final response = await http.get(Uri.parse('http://your-backend-url.com/api/todos'));
+  Future<void> _loadIssueList() async {
+    final response = await http.get(Uri.parse('${baseUrl}api/issues'));
 
     if (response.statusCode == 200) {
-      final List<dynamic> todoListJson = json.decode(response.body);
+      final List<dynamic> issueListJson  = json.decode(response.body);
       setState(() {
-        _todoList = todoListJson.map((item) {
+        _issueList = issueListJson.map((item) {
           return {
+            'category': item['category'],
             'title': item['title'],
+            'date': item['date'],
+            'description': item['description'],
             'completed': item['completed'],
           };
         }).toList();
       });
     } else {
-      throw Exception('Failed to load todos');
+      throw Exception('無法載入通報列表');
     }
   }
 
-  Future<void> _saveTodoList() async {
+  Future<void> _saveIssueList() async {
     final prefs = await SharedPreferences.getInstance();
-    prefs.setString('todoList', json.encode(_todoList));
+    prefs.setString('issueList', json.encode(_issueList));
   }
 
-  Future<void> _sendTodoListToBackend() async {
-    final url = Uri.parse('http://your-backend-url.com/api/todos');
-    for (var todoItem in _todoList) {
+  Future<void> _sendIssueListToBackend() async {
+    final url = Uri.parse('${baseUrl}api/issues');
+    for (var issueItem in _issueList) {
       await http.post(
         url,
         headers: {'Content-Type': 'application/json'},
-        body: json.encode(todoItem),
+        body: json.encode(issueItem),
       );
     }
   }
 
-  void _addTodoItem(String title) {
+  void _deleteIssueItem(int index) {
     setState(() {
-      _todoList.add({'title': title, 'completed': false});
+      _issueList.removeAt(index);
     });
-    _controller.clear();
-    _saveTodoList();
-    _sendTodoListToBackend();  // 保存後發送資料到後端
+    _saveIssueList();
+    _sendIssueListToBackend();
   }
 
-  void _toggleTodoItem(int index) {
-    setState(() {
-      _todoList[index]['completed'] = !_todoList[index]['completed'];
-    });
-    _saveTodoList();
-    _sendTodoListToBackend();  // 切換完成狀態後發送資料到後端
-  }
-
-  void _deleteTodoItem(int index) {
-    setState(() {
-      _todoList.removeAt(index);
-    });
-    _saveTodoList();
-    _sendTodoListToBackend();  // 刪除後發送資料到後端
-  }
-
-  void _showAddTodoDialog() {
-    showDialog(
-      context: context,
-      builder: (context) {
-        return AlertDialog(
-          title: const Text('Add a new task'),
-          content: TextField(
-            controller: _controller,
-            decoration: const InputDecoration(hintText: 'Enter task title'),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              child: const Text('Cancel'),
-            ),
-            ElevatedButton(
-              onPressed: () {
-                if (_controller.text.isNotEmpty) {
-                  _addTodoItem(_controller.text);
-                  Navigator.of(context).pop();
-                }
-              },
-              child: const Text('Add'),
-            ),
-          ],
-        );
-      },
-    );
-  }
-
-  Widget _buildTodoListPage() {
+  Widget _buildIssueListPage() {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('To-Do List'),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.arrow_forward),
-            onPressed: () {
-              Navigator.of(context).push(
-                MaterialPageRoute(builder: (context) => const SecondPage()),
-              );
-            },
-          ),
-        ],
+        title: const Text('市政通報追蹤'),
+        backgroundColor: Colors.blue,
       ),
       body: ListView.builder(
-        itemCount: _todoList.length,
+        itemCount: _issueList.length,
         itemBuilder: (context, index) {
-          final todoItem = _todoList[index];
+          final issueItem = _issueList[index];
           return ListTile(
             title: Text(
-              todoItem['title'],
+              issueItem['title'],
               style: TextStyle(
-                decoration: todoItem['completed']
+                decoration: issueItem['completed']
                     ? TextDecoration.lineThrough
                     : TextDecoration.none,
               ),
             ),
-            leading: Switch(
-              value: todoItem['completed'],
-              onChanged: (value) {
-                _toggleTodoItem(index);
-              },
+            leading: Icon(
+              issueItem['completed'] ? Icons.check_circle_outline : Icons.radio_button_unchecked,
+              color: issueItem['completed'] ? Colors.grey : Colors.blue,
             ),
-            trailing: IconButton(
-              icon: const Icon(Icons.delete),
-              onPressed: () {
-                _deleteTodoItem(index);
-              },
-            ),
+            trailing: issueItem['status'] == '未處理' 
+             ?  IconButton(
+                  icon: const Icon(Icons.delete),
+                  onPressed: () {
+                    _deleteIssueItem(index);
+                  },
+                )
+              : Icon(
+                Icons.delete,
+                color: Colors.grey, // 顯示灰色的刪除圖標，但不可點擊
+              )
           );
         },
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _showAddTodoDialog,
-        child: const Icon(Icons.add),
-      ),
+      )
     );
   }
 
-  Widget _buildLeftPage() {
-    return const LeftPage();
+  Widget _buildAddPage() {
+    return const AddPage();
   }
 
-  Widget _buildRightPage() {
-    return const RightPage();
+  Widget _buildExplainPage() {
+    return const ExplainPage();
   }
 
   void _onItemTapped(int index) {
@@ -204,24 +149,24 @@ class _MainScreenState extends State<MainScreen> {
       body: IndexedStack(
         index: _selectedIndex,
         children: [
-          _buildLeftPage(), // 左邊的頁面
-          _buildTodoListPage(), // 中間的 Home 頁面
-          _buildRightPage(), // 右邊的頁面
+          _buildAddPage(), // 左邊的頁面 - 新增
+          _buildIssueListPage(), // 中間的 Home 頁面
+          _buildExplainPage(), // 右邊的頁面 - 說明
         ],
       ),
       bottomNavigationBar: BottomNavigationBar(
         items: const <BottomNavigationBarItem>[
           BottomNavigationBarItem(
-            icon: Icon(Icons.arrow_back),
-            label: 'Page 1',
+            icon: Icon(Icons.add_box),
+            label: '新增',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            label: 'Home',
+            icon: Icon(Icons.list),
+            label: '列表',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.arrow_forward),
-            label: 'Page 3',
+            icon: Icon(Icons.description),
+            label: '說明',
           ),
         ],
         currentIndex: _selectedIndex,
