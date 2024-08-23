@@ -12,8 +12,17 @@ class AddPage extends StatefulWidget {
 }
 
 class _AddPageState extends State<AddPage> {
+  final List<String> _categories = [
+    '垃圾、噪音、汙染及資源回收', 
+    '道路、山坡地、樹路及路燈', 
+    '公園、排水溝、下水道及自來水',
+
+    // '垃圾、噪音、汙染及資源回收', 
+    // '道路、山坡地、樹路及路燈', 
+    // '公園、排水溝、下水道及自來水',
+  ];
+
   String _selectedCategory = '垃圾、噪音、汙染及資源回收';
-  final List<String> _categories = ['垃圾、噪音、汙染及資源回收', '道路、山坡地、樹路及路燈', '公園、排水溝、下水道及自來水'];
   String _title = '';
   DateTime _selectedDate = DateTime.now();
   String _description = '';
@@ -22,6 +31,22 @@ class _AddPageState extends State<AddPage> {
   void initState() {
     super.initState();
     _loadFormData();
+  }
+
+  void _updateSelectedCategory(String? newValue) {
+    if (newValue != null) {
+      setState(() {
+        _selectedCategory = newValue;
+        _saveFormData();
+      });
+    }
+  }
+
+  void _updateTitle (String value) {
+    setState(() {
+      _title = value;
+      _saveFormData();
+    });
   }
 
   Future<void> _selectDate(BuildContext context) async {
@@ -44,15 +69,6 @@ class _AddPageState extends State<AddPage> {
       _description = value;
       _saveFormData();
     });
-  }
-
-  void _updateSelectedCategory(String? newValue) {
-    if (newValue != null) {
-      setState(() {
-        _selectedCategory = newValue;
-        _saveFormData();
-      });
-    }
   }
 
   void _submitForm() async {
@@ -123,7 +139,7 @@ Widget build(BuildContext context) {
           const SizedBox(height: 8.0),
 
           DropdownButton<String>(
-            value: _selectedCategory,
+            value:_selectedCategory.isNotEmpty ? _selectedCategory : _categories.first,
             onChanged: _updateSelectedCategory,
             items: _categories.map<DropdownMenuItem<String>>((String value) {
               return DropdownMenuItem<String>(
@@ -138,10 +154,13 @@ Widget build(BuildContext context) {
           const Text('案件主旨'),
           const SizedBox(height: 8.0),
 
-          Text(
-            overflow: TextOverflow.fade,
+          TextField(
+            onChanged: _updateTitle,
+            decoration: InputDecoration(
+              border: OutlineInputBorder(),
+              hintText: '請輸入主旨',
+            ), 
             maxLines: 1,
-            '請輸入主旨'
           ),
           const SizedBox(height: 16.0),
 

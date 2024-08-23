@@ -92,7 +92,15 @@ class _IssueListPageState extends State<IssueListPage> {
   Widget _buildIssueListPage() {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('市政通報追蹤'),
+        title: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisSize: MainAxisSize.min,
+          children: <Widget>[
+            Text(
+              '市政通報追蹤'
+            ),
+          ],
+        ),
         backgroundColor: Colors.blue,
       ),
       body: ListView.builder(
