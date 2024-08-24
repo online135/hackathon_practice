@@ -132,7 +132,7 @@ class _IssueListPageState extends State<IssueListPage> {
               issueItem['title'],
             ),
             // 只有未處理的議題可以刪除
-            trailing: issueItem['status'] == 'A' 
+            trailing: issueItem['status'] == 'UNPROCESSED' 
              ?  IconButton(
                   icon: const Icon(Icons.delete),
                   onPressed: () {
