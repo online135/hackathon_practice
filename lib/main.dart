@@ -56,7 +56,7 @@ class _IssueListPageState extends State<IssueListPage> {
             'title': item['title'],
             'date': item['date'],
             'description': item['description'],
-            'completed': item['completed'],
+            'status': item['status'],
           };
         }).toList();
       });
@@ -110,23 +110,16 @@ class _IssueListPageState extends State<IssueListPage> {
           return ListTile(
             title: Text(
               issueItem['title'],
-              style: TextStyle(
-                decoration: issueItem['completed']
-                    ? TextDecoration.lineThrough
-                    : TextDecoration.none,
-              ),
             ),
-            leading: Icon(
-              issueItem['completed'] ? Icons.check_circle_outline : Icons.radio_button_unchecked,
-              color: issueItem['completed'] ? Colors.grey : Colors.blue,
-            ),
-            trailing: issueItem['status'] == '未處理' 
+            // 只有未處理的議題可以刪除
+            trailing: issueItem['status'] == 'A' 
              ?  IconButton(
                   icon: const Icon(Icons.delete),
                   onPressed: () {
                     _deleteIssueItem(index);
                   },
                 )
+            // 其他不允許刪除
               : Icon(
                 Icons.delete,
                 color: Colors.grey, // 顯示灰色的刪除圖標，但不可點擊
