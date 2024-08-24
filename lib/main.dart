@@ -83,16 +83,9 @@ class _IssueListPageState extends State<IssueListPage> {
     }
   }
 
-  void _deleteIssueItem(int index) async {
-    final issueItem = _issueList[index];
-
-    // Optimistic UI Update: Remove the item immediately
-    setState(() {
-      _issueList.removeAt(index);
-    });
-
+  void _deleteIssueItem(issueItem) async {
     final response = await http.delete(
-      Uri.parse('${baseUrl}api/issue/${issueItem['id']}'),
+      Uri.parse('${baseUrl}api/issues/${issueItem['id']}'),
       headers: {'Content-Type': 'application/json'},
     );
 
@@ -101,13 +94,14 @@ class _IssueListPageState extends State<IssueListPage> {
       _saveIssueList();
     } else {
       // Revert UI if backend deletion fails
-      setState(() {
-        _issueList.insert(index, issueItem);
-      });
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('無法刪除項目: ${issueItem['title']}')),
       );
     }
+
+    setState(() {
+      _issueList.removeWhere((item) => item['id'] == issueItem['id']);
+    });
   }
 
   Widget _buildIssueListPage() {
@@ -239,7 +233,7 @@ class _IssueListPageState extends State<IssueListPage> {
                   },
                   onLongPress: issueItem['status'] == 'UNPROCESSED'
                       ? () {
-                          _showDeleteConfirmationDialog(index);
+                          _showDeleteConfirmationDialog(issueItem);
                         }
                       : null, // Disable long press if not 'UNPROCESSED'
                 );
@@ -260,7 +254,7 @@ class _IssueListPageState extends State<IssueListPage> {
   }
 
   void _showIssueDetail(Map<String, dynamic> issueItem) async {
-    final response = await http.get(Uri.parse('${baseUrl}api/issue/${issueItem['id']}'));
+    final response = await http.get(Uri.parse('${baseUrl}api/issues/${issueItem['id']}'));
     if (response.statusCode == 200) {
       final issueDetail = json.decode(response.body);
       showDialog(
@@ -276,7 +270,7 @@ class _IssueListPageState extends State<IssueListPage> {
                     icon: const Icon(Icons.delete, color: Colors.red),
                     onPressed: () {
                       Navigator.of(context).pop(); // Close the dialog
-                      _showDeleteConfirmationDialog(issueDetail['id']);
+                      _showDeleteConfirmationDialog(issueItem);
                     },
                   ),
               ],
@@ -311,9 +305,7 @@ class _IssueListPageState extends State<IssueListPage> {
     }
   }
 
-  void _showDeleteConfirmationDialog(int index) {
-    final issueItem = _issueList[index];
-
+  void _showDeleteConfirmationDialog(issueItem) {
     showDialog(
       context: context,
       builder: (context) {
@@ -329,7 +321,7 @@ class _IssueListPageState extends State<IssueListPage> {
             ),
             TextButton(
               onPressed: () {
-                _deleteIssueItem(index);
+                _deleteIssueItem(issueItem);
                 Navigator.of(context).pop();
               },
               child: const Text('刪除'),
