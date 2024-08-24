@@ -3,6 +3,7 @@ import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'config.dart'; // 導入配置檔案
 
 class AddPage extends StatefulWidget {
   const AddPage({super.key});
@@ -22,7 +23,7 @@ class _AddPageState extends State<AddPage> {
     // '公園、排水溝、下水道及自來水',
   ];
 
-  String _selectedCategory = '';
+  String _selectedCategory = '垃圾、噪音、汙染及資源回收';
   String _title = '';
   DateTime _selectedDate = DateTime.now();
   String _description = '';
@@ -76,8 +77,7 @@ class _AddPageState extends State<AddPage> {
     if (_selectedCategory.isEmpty ||
         _title.isEmpty ||
         _description.isEmpty ||
-        _description.length < 10 ||
-        _selectedDate == null
+        _description.length < 10
     ) {
       print('所有欄位必須填寫且描述不少於10個字');
       ScaffoldMessenger.of(context).showSnackBar(
@@ -86,7 +86,7 @@ class _AddPageState extends State<AddPage> {
       return; // 中止發送
     }
 
-    final url = Uri.parse('http://localhost:8080/api/issue'); // Replace with your server's IP address or hostname
+    final url = Uri.parse('{$baseUrl}api/issue'); // Replace with your server's IP address or hostname
 
     final Map<String, dynamic> data = {
       'category': _selectedCategory,

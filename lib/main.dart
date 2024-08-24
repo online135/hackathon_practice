@@ -112,47 +112,143 @@ class _IssueListPageState extends State<IssueListPage> {
   Widget _buildIssueListPage() {
     return Scaffold(
       appBar: AppBar(
-        title: const Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          mainAxisSize: MainAxisSize.min,
-          children: <Widget>[
-            Text(
-              '市政通報追蹤'
-            ),
-          ],
-        ),
+        title: const Text('市政通報追蹤'),
         backgroundColor: Colors.blue,
       ),
-      body: ListView.builder(
-        itemCount: _issueList.length,
-        itemBuilder: (context, index) {
-          final issueItem = _issueList[index];
-          return ListTile(
-            title: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+      body: Column(
+        children: [
+          // Header Row
+          const Padding(
+            padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+            child: Row(
               children: [
-                Text(
-                  issueItem['title'],
-                  style: const TextStyle(fontWeight: FontWeight.bold),
+                // Date
+                SizedBox(
+                  width: 100, // Adjust width to your needs
+                  child: Text(
+                    '日期',
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                  ),
                 ),
-                const SizedBox(height: 4),
-                Text('類別: ${issueItem['category']}'),
-                Text('日期: ${issueItem['date']}'),
+                SizedBox(width: 16), // Add spacing between date and category
+
+                // Category
+                SizedBox(
+                  width: 100, // Adjust width to your needs
+                  child: Text(
+                    '類別',
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                ),
+                SizedBox(width: 16), // Add spacing between category and title
+              
+                // Title
+                SizedBox(
+                  width: 150, // Adjust width to match your needs
+                  child: Text(
+                    '主旨',
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                    textAlign: TextAlign.start, // Align the header text to the start
+                  ),
+                ),
+                SizedBox(width: 16), // Add spacing between title and status
+
+                // Status
+                Align(
+                  alignment: Alignment.bottomRight,
+                  child:                 const SizedBox(
+                  width: 80, // Adjust width to match the status column
+                  child: Align(
+                    alignment: Alignment.bottomRight, // Align the status header text to the bottom right
+                    child: const Text(
+                      '狀態',
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                )
+                ),
               ],
             ),
-            trailing: _getStatusIcon(issueItem['status']) // 顯示圖標和文字描述
-            , // 顯示不同的圖標根據 status
-            onTap: () {
-              _showIssueDetail(issueItem);
-            },
-            onLongPress: issueItem['status'] == 'UNPROCESSED'
-                ? () {
-                    _showDeleteConfirmationDialog(index);
-                  }
-                : null, // Disable long press if not 'UNPROCESSED'
-          );
-        },
-      )
+          ),
+          const Divider(thickness: 1), // Divider line below the header
+          // Issue List
+          Expanded(
+            child: ListView.builder(
+              itemCount: _issueList.length,
+              itemBuilder: (context, index) {
+                final issueItem = _issueList[index];
+                return ListTile(
+                  contentPadding: EdgeInsets.zero, // Remove default padding
+                  title: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start, // Align items to the top
+                    children: [
+                      // Display Date
+                      SizedBox(
+                        width: 100, // Adjust width to match header width
+                        child: Text(
+                          issueItem['date'],
+                          style: const TextStyle(fontWeight: FontWeight.normal),
+                        ),
+                      ),
+                      const SizedBox(width: 16), // Add spacing between date and category
+
+                      // Display Category
+                      SizedBox(
+                        width: 100, // Adjust width to match header width
+                        child: Text(
+                          issueItem['category'],
+                          style: const TextStyle(fontWeight: FontWeight.normal),
+                        ),
+                      ),
+                      const SizedBox(width: 16), // Add spacing between category and title
+
+                      // Display Title
+                      SizedBox(
+                        child: Text(
+                          issueItem['title'],
+                          style: const TextStyle(fontWeight: FontWeight.bold),
+                          overflow: TextOverflow.ellipsis, // Truncate title with ellipsis if too long
+                          textAlign: TextAlign.start, // Align the title to the start
+                        ),
+                      ),
+
+                      // Display Status
+                      SizedBox(
+                        width: 80, // Adjust width to match the status column
+                        child: Align(
+                          alignment: Alignment.bottomRight,  // Align the status icon to the bottom right
+                          child: _getStatusIcon(issueItem['status']),
+                        ) 
+                      ),
+                    ],
+                  ),
+                  trailing: SizedBox(
+                    width: 80, // Match the status column width
+                    child: Align(
+                      alignment: Alignment.bottomRight, // Align the status text to the bottom right
+                      child: Text(
+                        _getStatusText(issueItem['status']),
+                        style: TextStyle(
+                          color: _getStatusColor(issueItem['status']), // Status color
+                        ),
+                        textAlign: TextAlign.right, // Align text to the right
+                      ),
+                    )
+                  ),
+                  onTap: () {
+                    _showIssueDetail(issueItem);
+                  },
+                  onLongPress: issueItem['status'] == 'UNPROCESSED'
+                      ? () {
+                          _showDeleteConfirmationDialog(index);
+                        }
+                      : null, // Disable long press if not 'UNPROCESSED'
+                );
+              },
+            ),
+          ),
+        ],
+      ),
     );
   }
 
@@ -245,16 +341,45 @@ class _IssueListPageState extends State<IssueListPage> {
     );
   }
 
- Widget _getStatusIcon(String status) {
+  Widget _getStatusIcon(String status) {
     switch (status) {
       case 'UNPROCESSED':
-        return const Icon(Icons.circle, color: Colors.red);
-      case 'PROCESSING':
         return const Icon(Icons.circle, color: Colors.orange);
+      case 'PROCESSING':
+        return const Icon(Icons.circle, color: Colors.blue);
       case 'PROCESSED':
         return const Icon(Icons.circle, color: Colors.green);
       default:
         return const Icon(Icons.circle, color: Colors.grey);
+    }
+  }
+
+  // 保持三個字的長度
+  // Method to get the status text based on the status
+  String _getStatusText(String status) {
+    switch (status) {
+      case 'UNPROCESSED':
+        return '未處理';
+      case 'PROCESSING':
+        return '處理中';
+      case 'PROCESSED':
+        return '已處理';
+      default:
+        return 'Other';
+    }
+  }
+
+  // Method to get the status color based on the status
+  Color _getStatusColor(String status) {
+    switch (status) {
+      case 'UNPROCESSED':
+        return Colors.orange;
+      case 'IN_PROGRESS':
+        return Colors.blue;
+      case 'PROCESSED':
+        return Colors.green;
+      default:
+        return Colors.grey;
     }
   }
 
