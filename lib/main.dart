@@ -140,7 +140,7 @@ class _IssueListPageState extends State<IssueListPage> {
                 Text('日期: ${issueItem['date']}'),
               ],
             ),
-            trailing: _getStatusIcon(issueItem['status'])
+            trailing: _getStatusIcon(issueItem['status']) // 顯示圖標和文字描述
             , // 顯示不同的圖標根據 status
             onTap: () {
               _showIssueDetail(issueItem);
@@ -172,7 +172,20 @@ class _IssueListPageState extends State<IssueListPage> {
         context: context,
         builder: (context) {
           return AlertDialog(
-            title: Text(issueDetail['title']),
+            title: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(issueDetail['title']),
+                if (issueDetail['status'] == 'UNPROCESSED') 
+                  IconButton(
+                    icon: const Icon(Icons.delete, color: Colors.red),
+                    onPressed: () {
+                      Navigator.of(context).pop(); // Close the dialog
+                      _showDeleteConfirmationDialog(issueDetail['id']);
+                    },
+                  ),
+              ],
+            ),
             content: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisSize: MainAxisSize.min,
@@ -219,15 +232,13 @@ class _IssueListPageState extends State<IssueListPage> {
               },
               child: const Text('取消'),
             ),
-            if (issueItem['status'] == 'UNPROCESSED') ...[
-              TextButton(
-                onPressed: () {
-                  _deleteIssueItem(index);
-                  Navigator.of(context).pop();
-                },
-                child: const Text('刪除'),
-              ),
-            ],
+            TextButton(
+              onPressed: () {
+                _deleteIssueItem(index);
+                Navigator.of(context).pop();
+              },
+              child: const Text('刪除'),
+            ),
           ],
         );
       },
