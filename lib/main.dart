@@ -128,22 +128,28 @@ class _IssueListPageState extends State<IssueListPage> {
         itemBuilder: (context, index) {
           final issueItem = _issueList[index];
           return ListTile(
-            title: Text(
-              issueItem['title'],
+            title: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  issueItem['title'],
+                  style: const TextStyle(fontWeight: FontWeight.bold),
+                ),
+                const SizedBox(height: 4),
+                Text('類別: ${issueItem['category']}'),
+                Text('日期: ${issueItem['date']}'),
+              ],
             ),
-            // 只有未處理的議題可以刪除
-            trailing: issueItem['status'] == 'UNPROCESSED' 
-             ?  IconButton(
-                  icon: const Icon(Icons.delete),
-                  onPressed: () {
-                    _deleteIssueItem(index);
-                  },
-                )
-            // 其他不允許刪除
-              : Icon(
-                Icons.delete,
-                color: Colors.grey, // 顯示灰色的刪除圖標，但不可點擊
-              )
+            trailing: _getStatusIcon(issueItem['status'])
+            , // 顯示不同的圖標根據 status
+            onTap: () {
+              _showIssueDetail(issueItem);
+            },
+            onLongPress: issueItem['status'] == 'UNPROCESSED'
+                ? () {
+                    _showDeleteConfirmationDialog(index);
+                  }
+                : null, // Disable long press if not 'UNPROCESSED'
           );
         },
       )
@@ -156,6 +162,89 @@ class _IssueListPageState extends State<IssueListPage> {
 
   Widget _buildExplainPage() {
     return const ExplainPage();
+  }
+
+  void _showIssueDetail(Map<String, dynamic> issueItem) async {
+    final response = await http.get(Uri.parse('${baseUrl}api/issue/${issueItem['id']}'));
+    if (response.statusCode == 200) {
+      final issueDetail = json.decode(response.body);
+      showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            title: Text(issueDetail['title']),
+            content: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text('類別: ${issueDetail['category']}'),
+                Text('日期: ${issueDetail['date']}'),
+                const SizedBox(height: 8),
+                Text('描述: ${issueDetail['description']}'),
+                const SizedBox(height: 8),
+                Text('狀態: ${issueDetail['status']}'),
+              ],
+            ),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                child: const Text('關閉'),
+              ),
+            ],
+          );
+        },
+      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('無法載入通報詳情: ${issueItem['title']}')),
+      );
+    }
+  }
+
+  void _showDeleteConfirmationDialog(int index) {
+    final issueItem = _issueList[index];
+
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text('刪除通報'),
+          content: Text('您確定要刪除 ${issueItem['title']} 嗎？'),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: const Text('取消'),
+            ),
+            if (issueItem['status'] == 'UNPROCESSED') ...[
+              TextButton(
+                onPressed: () {
+                  _deleteIssueItem(index);
+                  Navigator.of(context).pop();
+                },
+                child: const Text('刪除'),
+              ),
+            ],
+          ],
+        );
+      },
+    );
+  }
+
+ Widget _getStatusIcon(String status) {
+    switch (status) {
+      case 'UNPROCESSED':
+        return const Icon(Icons.circle, color: Colors.red);
+      case 'PROCESSING':
+        return const Icon(Icons.circle, color: Colors.orange);
+      case 'PROCESSED':
+        return const Icon(Icons.circle, color: Colors.green);
+      default:
+        return const Icon(Icons.circle, color: Colors.grey);
+    }
   }
 
   void _onItemTapped(int index) {
