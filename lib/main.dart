@@ -61,6 +61,7 @@ class _IssueListPageState extends State<IssueListPage> {
           };
         }).toList();
       });
+
     } else {
       throw Exception('無法載入通報列表');
     }
@@ -154,9 +155,7 @@ class _IssueListPageState extends State<IssueListPage> {
                 SizedBox(width: 16), // Add spacing between title and status
 
                 // Status
-                Align(
-                  alignment: Alignment.bottomRight,
-                  child:                 const SizedBox(
+                const SizedBox(
                   width: 80, // Adjust width to match the status column
                   child: Align(
                     alignment: Alignment.bottomRight, // Align the status header text to the bottom right
@@ -166,7 +165,7 @@ class _IssueListPageState extends State<IssueListPage> {
                     ),
                   ),
                 )
-                ),
+                
               ],
             ),
           ),

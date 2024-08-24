@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'mock_data.dart'; // 導入模擬數據
 import 'right2_page.dart'; // 導入模擬數據
+import 'package:http/http.dart' as http;
 
 
 class ExplainPage extends StatefulWidget {
@@ -23,25 +24,26 @@ class _ExplainPageState extends State<ExplainPage> {
   }
 
   Future<List<Toilet>> _fetchData() async {
-    // 使用模擬數據而不是實際的 API 調用
-    await Future.delayed(const Duration(seconds: 1)); // 模擬網絡延遲
-    final jsonData = jsonDecode(mockApiResponse);
-    final results = jsonData['result']['results'] as List;
-    return results.map((toiletData) => Toilet.fromJson(toiletData)).toList();
+    // // 使用模擬數據而不是實際的 API 調用
+    // await Future.delayed(const Duration(seconds: 1)); // 模擬網絡延遲
+    // final jsonData = jsonDecode(mockApiResponse);
+    // final results = jsonData['result']['results'] as List;
+    // return results.map((toiletData) => Toilet.fromJson(toiletData)).toList();
+
+    final corsProxyUrl = 'https://cors-anywhere.herokuapp.com/';
+    final apiUrl = 'https://data.taipei/api/v1/dataset/9e0e6ad4-b9f9-4810-8551-0cffd1b915b3?scope=resourceAquire';
+    final response = await http.get(Uri.parse(corsProxyUrl + apiUrl));
 
 
-    // 只能用在開發模式
-    // final corsProxyUrl = 'https://cors-anywhere.herokuapp.com/';
-    // final apiUrl = 'https://data.taipei/api/v1/dataset/9e0e6ad4-b9f9-4810-8551-0cffd1b915b3?scope=resourceAquire';
-    // final response = await http.get(Uri.parse(corsProxyUrl + apiUrl));
+    if (response.statusCode == 200) {
+      // Decode the response body as UTF-8
+      final jsonData = jsonDecode(utf8.decode(response.bodyBytes));
 
-    // if (response.statusCode == 200) {
-    //   final jsonData = jsonDecode(response.body);
-    //   final results = jsonData['result']['results'] as List;
-    //   return results.map((toiletData) => Toilet.fromJson(toiletData)).toList();
-    // } else {
-    //   throw Exception('Failed to load toilets');
-    // }
+      final results = jsonData['result']['results'] as List;
+      return results.map((toiletData) => Toilet.fromJson(toiletData)).toList();
+    } else {
+      throw Exception('Failed to load toilets');
+    }
   }
 
   @override
@@ -118,13 +120,13 @@ class Toilet {
 
   factory Toilet.fromJson(Map<String, dynamic> json) {
     return Toilet(
-      id: json['_id'],
-      district: json['行政區'],
-      category: json['公廁類別'],
-      name: json['公廁名稱'],
-      address: json['公廁地址'],
-      longitude: json['經度'],
-      latitude: json['緯度'],
+      id: json['_id'] ?? ' ',
+      district: json['行政區'] ?? ' ',
+      category: json['公廁類別'] ?? ' ',
+      name: json['公廁名稱'] ?? ' ',
+      address: json['公廁地址'] ?? ' ',
+      longitude: json['經度'] ?? ' ',
+      latitude: json['緯度'] ?? ' ',
     );
   }
 }

@@ -44,8 +44,15 @@ dependencies:
   camera: 0.10.5+2
   # 儲存至相簿
   gallery_saver: ^2.3.2
+  # webview_flutter: 4.9.0
 
   intl: any
+
+  # This script only disables CORS checks for local testing, 
+  # and will not help with CORS issues in production. 
+  # Do not ask for help with production CORS issues as that is outside the scope of this project.
+  flutter_cors: 1.5.0
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
