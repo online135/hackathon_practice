@@ -112,7 +112,7 @@ class _IssueListPageState extends State<IssueListPage> {
   Widget _buildIssueListPage() {
     return Scaffold(
       appBar: AppBar(
-        title: Row(
+        title: const Row(
           mainAxisAlignment: MainAxisAlignment.center,
           mainAxisSize: MainAxisSize.min,
           children: <Widget>[
@@ -223,7 +223,7 @@ class _IssueListPageState extends State<IssueListPage> {
       context: context,
       builder: (context) {
         return AlertDialog(
-          title: Text('刪除通報'),
+          title: const Text('刪除通報'),
           content: Text('您確定要刪除 ${issueItem['title']} 嗎？'),
           actions: [
             TextButton(

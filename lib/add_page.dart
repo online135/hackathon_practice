@@ -22,7 +22,7 @@ class _AddPageState extends State<AddPage> {
     // '公園、排水溝、下水道及自來水',
   ];
 
-  String _selectedCategory = '垃圾、噪音、汙染及資源回收';
+  String _selectedCategory = '';
   String _title = '';
   DateTime _selectedDate = DateTime.now();
   String _description = '';
@@ -72,6 +72,20 @@ class _AddPageState extends State<AddPage> {
   }
 
   void _submitForm() async {
+    // 確認所有欄位不為空，且敘述不少於10個字
+    if (_selectedCategory.isEmpty ||
+        _title.isEmpty ||
+        _description.isEmpty ||
+        _description.length < 10 ||
+        _selectedDate == null
+    ) {
+      print('所有欄位必須填寫且描述不少於10個字');
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('請填寫所有欄位且描述不少於10個字')),
+      );
+      return; // 中止發送
+    }
+
     final url = Uri.parse('http://localhost:8080/api/issue'); // Replace with your server's IP address or hostname
 
     final Map<String, dynamic> data = {
@@ -108,7 +122,7 @@ class _AddPageState extends State<AddPage> {
   Future<void> _loadFormData() async {
     final prefs = await SharedPreferences.getInstance();
     setState(() {
-      _selectedCategory = prefs.getString('category') ?? '';
+      _selectedCategory = prefs.getString('category') ?? _selectedCategory;
       _title = prefs.getString('title') ?? '';
       _selectedDate = DateTime.parse(prefs.getString('selectedDate') ?? _selectedDate.toString());
       _description = prefs.getString('description') ?? '';
@@ -135,11 +149,18 @@ Widget build(BuildContext context) {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // 案件類別: Category
-          const Text('選擇案件類別'),
+          const Text('請選擇案件類別'),
           const SizedBox(height: 8.0),
 
           DropdownButton<String>(
-            value:_selectedCategory.isNotEmpty ? _selectedCategory : _categories.first,
+            hint: Text(
+              '案件類別',
+              style: TextStyle(
+                fontSize: 14,
+                color: Theme.of(context).hintColor,
+              ),
+            ),
+            value: _selectedCategory.isNotEmpty ? _selectedCategory : _categories.first,
             onChanged: _updateSelectedCategory,
             items: _categories.map<DropdownMenuItem<String>>((String value) {
               return DropdownMenuItem<String>(
@@ -156,7 +177,7 @@ Widget build(BuildContext context) {
 
           TextField(
             onChanged: _updateTitle,
-            decoration: InputDecoration(
+            decoration: const InputDecoration(
               border: OutlineInputBorder(),
               hintText: '請輸入主旨',
             ), 
