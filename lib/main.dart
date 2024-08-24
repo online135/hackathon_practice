@@ -52,6 +52,7 @@ class _IssueListPageState extends State<IssueListPage> {
       setState(() {
         _issueList = issueListJson.map((item) {
           return {
+            'id': item['id'],
             'category': item['category'],
             'title': item['title'],
             'date': item['date'],
@@ -81,12 +82,31 @@ class _IssueListPageState extends State<IssueListPage> {
     }
   }
 
-  void _deleteIssueItem(int index) {
+  void _deleteIssueItem(int index) async {
+    final issueItem = _issueList[index];
+
+    // Optimistic UI Update: Remove the item immediately
     setState(() {
       _issueList.removeAt(index);
     });
-    _saveIssueList();
-    _sendIssueListToBackend();
+
+    final response = await http.delete(
+      Uri.parse('${baseUrl}api/issue/${issueItem['id']}'),
+      headers: {'Content-Type': 'application/json'},
+    );
+
+    if (response.statusCode == 200) {
+      // Deletion successful, save the list locally
+      _saveIssueList();
+    } else {
+      // Revert UI if backend deletion fails
+      setState(() {
+        _issueList.insert(index, issueItem);
+      });
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('無法刪除項目: ${issueItem['title']}')),
+      );
+    }
   }
 
   Widget _buildIssueListPage() {
